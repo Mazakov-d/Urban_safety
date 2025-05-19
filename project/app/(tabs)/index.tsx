@@ -16,6 +16,18 @@ function WebMapFallback() {
   );
 }
 
+// Only import MapView components when needed
+let MapView, Marker;
+if (Platform.OS !== 'web') {
+  try {
+    const Maps = require('react-native-maps');
+    MapView = Maps.default;
+    Marker = Maps.Marker;
+  } catch (e) {
+    console.warn("Could not load react-native-maps:", e);
+  }
+}
+
 export default function MapScreen() {
   const [location, setLocation] = useState(null);
   const [errorMsg, setErrorMsg] = useState(null);
@@ -80,51 +92,52 @@ export default function MapScreen() {
 
   // Conditionally render map or web fallback
   const MapViewComponent = () => {
-    if (Platform.OS === 'web') {
+    if (Platform.OS === 'web' || !MapView) {
       return <WebMapFallback />;
     }
 
-    // Only import MapView when not on web platform
-    const MapView = require('react-native-maps').default;
-    const Marker = require('react-native-maps').Marker;
-
-    return (
-      <MapView
-        style={styles.map}
-        region={mapRegion}
-        provider={Platform.OS === 'android' ? require('react-native-maps').PROVIDER_GOOGLE : null}
-        showsUserLocation={true}
-        showsMyLocationButton={true}
-      >
-        {nearbyHelpers.map(helper => (
-          <Marker
-            key={`helper-${helper.id}`}
-            coordinate={{
-              latitude: helper.latitude,
-              longitude: helper.longitude
-            }}
-          >
-            <View style={styles.helperMarker}>
-              <UserCircle2 size={24} color="#3B82F6" />
-            </View>
-          </Marker>
-        ))}
-        
-        {safeLocations.map(location => (
-          <Marker
-            key={`location-${location.id}`}
-            coordinate={{
-              latitude: location.latitude,
-              longitude: location.longitude
-            }}
-          >
-            <View style={styles.safeLocationMarker}>
-              <Home size={24} color="#10B981" />
-            </View>
-          </Marker>
-        ))}
-      </MapView>
-    );
+    try {
+      return (
+        <MapView
+          style={styles.map}
+          region={mapRegion}
+          provider={Platform.OS === 'android' ? (MapView.PROVIDER_GOOGLE || 'google') : undefined}
+          showsUserLocation={true}
+          showsMyLocationButton={true}
+        >
+          {nearbyHelpers.map(helper => (
+            <Marker
+              key={`helper-${helper.id}`}
+              coordinate={{
+                latitude: helper.latitude,
+                longitude: helper.longitude
+              }}
+            >
+              <View style={styles.helperMarker}>
+                <UserCircle2 size={24} color="#3B82F6" />
+              </View>
+            </Marker>
+          ))}
+          
+          {safeLocations.map(location => (
+            <Marker
+              key={`location-${location.id}`}
+              coordinate={{
+                latitude: location.latitude,
+                longitude: location.longitude
+              }}
+            >
+              <View style={styles.safeLocationMarker}>
+                <Home size={24} color="#10B981" />
+              </View>
+            </Marker>
+          ))}
+        </MapView>
+      );
+    } catch (error) {
+      console.warn("Error rendering map:", error);
+      return <WebMapFallback />;
+    }
   };
 
   return (

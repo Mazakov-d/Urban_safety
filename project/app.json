@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "bolt-expo-nativewind",
-    "slug": "bolt-expo-nativewind",
+    "name": "urban-sanctuary",
+    "slug": "urban-sanctuary",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -9,7 +9,18 @@
     "userInterfaceStyle": "automatic",
     "newArchEnabled": true,
     "ios": {
-      "supportsTablet": true
+      "bundleIdentifier": "com.yourdomain.urbansanctuary",
+      "buildNumber": "1.0.0",
+      "supportsTablet": true,
+      "config": {
+        "usesNonExemptEncryption": false
+      },
+      "infoPlist": {
+        "NSCameraUsageDescription": "This app uses the camera for identity verification",
+        "NSLocationWhenInUseUsageDescription": "This app uses your location to show nearby safe locations and helpers",
+        "NSLocationAlwaysUsageDescription": "This app uses your location to provide emergency assistance when needed",
+        "NSLocationAlwaysAndWhenInUseUsageDescription": "This app uses your location to provide emergency assistance and show nearby safe locations"
+      }
     },
     "web": {
       "bundler": "metro",
